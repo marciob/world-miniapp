@@ -1,0 +1,34 @@
+{
+	"name": "miniapp-llm",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@ai-sdk/openai": "^0.0.70",
+		"@worldcoin/idkit": "^1.3.0",
+		"@worldcoin/minikit-js": "^1.0.0",
+		"@worldcoin/minikit-react": "^1.0.0",
+		"ai": "^3.4.20",
+		"eruda": "^3.4.0",
+		"framer-motion": "^11.11.10",
+		"lucide-react": "^0.453.0",
+		"next": "15.0.1",
+		"next-auth": "^4.24.10",
+		"openai-edge": "^1.2.2",
+		"react": "19.0.0-rc-69d4b800-20241021",
+		"react-dom": "19.0.0-rc-69d4b800-20241021"
+	},
+	"devDependencies": {
+		"typescript": "^5",
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"postcss": "^8",
+		"tailwindcss": "^3.4.1"
+	}
+}
