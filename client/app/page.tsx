@@ -8,6 +8,7 @@ import { AIChat } from '@/components/AIChat'
 import { motion } from 'framer-motion'
 import Interest from '@/components/Interests'
 import Languages from '@/components/Languages'
+import Conversation from '@/components/Conversation'
 
 export default function Home() {
 	const [activeTab, setActiveTab] = useState('current')
@@ -43,6 +44,7 @@ export default function Home() {
 				</motion.div>
 				<Interest />
 				<Languages />
+				<Conversation />
 			</div>
 		</main>
 	)
