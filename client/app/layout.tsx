@@ -1,4 +1,4 @@
-// layout.tsx
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -6,6 +6,7 @@ import MiniKitProvider from "@/components/minikit-provider";
 import ClientErudaProvider from "@/providers/ClientErudaProvider";
 import NextAuthProvider from "@/components/next-auth-provider";
 import ClientOnlyRedirect from "@/components/OnboardingRedirect/ClientOnlyRedirect";
+import ClientLayout from "@/components/ClientLayout"; // Import ClientLayout
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +26,10 @@ export default function RootLayout({
         <NextAuthProvider>
           <ClientOnlyRedirect>
             <ClientErudaProvider>
-              <MiniKitProvider>{children}</MiniKitProvider>
+              <MiniKitProvider>
+                <ClientLayout>{children}</ClientLayout>{" "}
+                {/* Wrap children in ClientLayout */}
+              </MiniKitProvider>
             </ClientErudaProvider>
           </ClientOnlyRedirect>
         </NextAuthProvider>
