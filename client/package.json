@@ -21,14 +21,16 @@
 		"next-auth": "^4.24.10",
 		"openai-edge": "^1.2.2",
 		"react": "19.0.0-rc-69d4b800-20241021",
-		"react-dom": "19.0.0-rc-69d4b800-20241021"
+		"react-dom": "19.0.0-rc-69d4b800-20241021",
+		"react-icons": "^5.3.0",
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
-		"typescript": "^5",
 		"@types/node": "^20",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
 		"postcss": "^8",
-		"tailwindcss": "^3.4.1"
+		"tailwindcss": "^3.4.1",
+		"typescript": "^5"
 	}
 }

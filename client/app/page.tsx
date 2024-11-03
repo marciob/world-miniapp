@@ -6,6 +6,8 @@ import { SignIn } from '@/components/SignIn'
 import { VerifyBlock } from '@/components/Verify'
 import { AIChat } from '@/components/AIChat'
 import { motion } from 'framer-motion'
+import Interest from '@/components/Interests'
+import Languages from '@/components/Languages'
 
 export default function Home() {
 	const [activeTab, setActiveTab] = useState('current')
@@ -39,6 +41,8 @@ export default function Home() {
 						<AIChat />
 					)}
 				</motion.div>
+				<Interest />
+				<Languages />
 			</div>
 		</main>
 	)
