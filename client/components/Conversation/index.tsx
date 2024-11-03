@@ -6,7 +6,7 @@ import { User, Languages, RotateCw, Mic, Volume2, VolumeX } from "lucide-react";
 interface Message {
   id: string;
   text: string;
-  speaker: 'You' | 'Emma';
+  speaker: "You" | "Emma";
   timestamp: string;
 }
 
@@ -29,17 +29,18 @@ export default function ChatComponent() {
     audioRef.current = new Audio();
     audioRef.current.crossOrigin = "anonymous";
     audioRef.current.preload = "auto";
-    
+
     audioRef.current.onplay = () => setIsSpeaking(true);
     audioRef.current.onended = () => setIsSpeaking(false);
     audioRef.current.onerror = (e) => {
-      console.error('Audio error:', e);
+      console.error("Audio error:", e);
       setIsSpeaking(false);
     };
 
     if (messages.length === 0) {
-      const welcomeMessage = "Hello! I'm Emma, your AI assistant. How can I help you today?";
-      addMessage(welcomeMessage, 'Emma');
+      const welcomeMessage =
+        "Hello! I'm Emma, your AI assistant. How can I help you today?";
+      addMessage(welcomeMessage, "Emma");
     }
 
     return () => {
@@ -57,9 +58,9 @@ export default function ChatComponent() {
   }, [messages]);
 
   const getCurrentTime = () => {
-    return new Date().toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -71,13 +72,13 @@ export default function ChatComponent() {
           audioRef.current.currentTime = 0;
         }
 
-        const response = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
         });
 
-        if (!response.ok) throw new Error('Failed to generate speech');
+        if (!response.ok) throw new Error("Failed to generate speech");
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -98,29 +99,29 @@ export default function ChatComponent() {
             .then(() => {
               setIsSpeaking(true);
             })
-            .catch(error => {
-              console.error('Audio playback failed:', error);
+            .catch((error) => {
+              console.error("Audio playback failed:", error);
               setIsSpeaking(false);
             });
         }
       } catch (error) {
-        console.error('Error playing audio:', error);
+        console.error("Error playing audio:", error);
         setIsSpeaking(false);
       }
     }
   };
 
-  const addMessage = async (text: string, speaker: 'You' | 'Emma') => {
+  const addMessage = async (text: string, speaker: "You" | "Emma") => {
     const newMessage: Message = {
       id: Date.now().toString(),
       text,
       speaker,
-      timestamp: getCurrentTime()
+      timestamp: getCurrentTime(),
     };
-    
-    setMessages(prev => [...prev, newMessage]);
 
-    if (speaker === 'Emma') {
+    setMessages((prev) => [...prev, newMessage]);
+
+    if (speaker === "Emma") {
       await playAudio(text);
     }
   };
@@ -135,31 +136,31 @@ export default function ChatComponent() {
 
   const getAIResponse = async (userMessage: string) => {
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
       });
 
-      if (!response.ok) throw new Error('Failed to get AI response');
+      if (!response.ok) throw new Error("Failed to get AI response");
 
       const data = await response.json();
-      await addMessage(data.text, 'Emma');
+      await addMessage(data.text, "Emma");
     } catch (error) {
-      console.error('Error getting AI response:', error);
-      await addMessage("I'm sorry, I couldn't process that right now.", 'Emma');
+      console.error("Error getting AI response:", error);
+      await addMessage("I'm sorry, I couldn't process that right now.", "Emma");
     }
   };
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
           sampleRate: 44100,
-        } 
+        },
       });
 
       const mediaRecorder = new MediaRecorder(stream);
@@ -188,22 +189,22 @@ export default function ChatComponent() {
       setIsRecording(false);
       setIsProcessing(true);
 
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
       const formData = new FormData();
-      formData.append('audio', audioBlob);
+      formData.append("audio", audioBlob);
 
       try {
-        const response = await fetch('/api/stt', {
-          method: 'POST',
+        const response = await fetch("/api/stt", {
+          method: "POST",
           body: formData,
         });
 
-        if (!response.ok) throw new Error('Failed to transcribe audio');
-        
+        if (!response.ok) throw new Error("Failed to transcribe audio");
+
         const { text } = await response.json();
         await handleChatFlow(text);
       } catch (error) {
-        console.error('Error in transcription:', error);
+        console.error("Error in transcription:", error);
         setIsProcessing(false);
       }
 
@@ -214,21 +215,22 @@ export default function ChatComponent() {
 
   const transcribeAudio = async (audioBlob: Blob) => {
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'audio.wav');
+    formData.append("audio", audioBlob, "audio.wav");
 
     try {
-      const response = await fetch('/api/stt', {
-        method: 'POST',
+      const response = await fetch("/api/stt", {
+        method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
       setTranscript(data.text);
-      await addMessage(data.text, 'You');
+      await addMessage(data.text, "You");
       await getAIResponse(data.text);
     } catch (error) {
       console.error("Error in transcription:", error);
@@ -238,7 +240,7 @@ export default function ChatComponent() {
 
   const handleToggleRecording = () => {
     if (isSpeaking) return; // Prevent recording while AI is speaking
-    
+
     if (isRecording) {
       stopRecording();
     } else {
@@ -248,24 +250,24 @@ export default function ChatComponent() {
 
   const handleChatFlow = async (userMessage: string) => {
     // Add user message to chat
-    await addMessage(userMessage, 'You');
-    
+    await addMessage(userMessage, "You");
+
     setIsProcessing(true);
     try {
       // Get AI response
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
       });
 
-      if (!response.ok) throw new Error('Failed to get AI response');
-      
+      if (!response.ok) throw new Error("Failed to get AI response");
+
       const data = await response.json();
-      await addMessage(data.text, 'Emma');
+      await addMessage(data.text, "Emma");
     } catch (error) {
-      console.error('Error in chat flow:', error);
-      addMessage("I'm sorry, I couldn't process that request.", 'Emma');
+      console.error("Error in chat flow:", error);
+      addMessage("I'm sorry, I couldn't process that request.", "Emma");
     } finally {
       setIsProcessing(false);
     }
@@ -273,19 +275,24 @@ export default function ChatComponent() {
 
   const initializeAudioContext = () => {
     try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContext =
+        window.AudioContext || (window as any).webkitAudioContext;
       const audioContext = new AudioContext();
-      
+
       // Resume audio context on user interaction
-      document.addEventListener('touchstart', () => {
-        if (audioContext.state === 'suspended') {
-          audioContext.resume();
-        }
-      }, { once: true });
-      
+      document.addEventListener(
+        "touchstart",
+        () => {
+          if (audioContext.state === "suspended") {
+            audioContext.resume();
+          }
+        },
+        { once: true }
+      );
+
       return audioContext;
     } catch (error) {
-      console.error('WebView AudioContext initialization failed:', error);
+      console.error("WebView AudioContext initialization failed:", error);
       return null;
     }
   };
@@ -293,7 +300,7 @@ export default function ChatComponent() {
   useEffect(() => {
     const audioContext = initializeAudioContext();
     if (!audioContext) {
-      console.warn('Audio might not work in this WebView environment');
+      console.warn("Audio might not work in this WebView environment");
     }
   }, []);
 
@@ -303,8 +310,7 @@ export default function ChatComponent() {
       <div className="flex items-center p-4 text-white">
         <div className="text-sm">{getCurrentTime()}</div>
         <div className="flex-grow"></div>
-        <div className="flex items-center gap-2">
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
 
       {/* Navigation */}
@@ -312,12 +318,16 @@ export default function ChatComponent() {
         <button className="p-2">←</button>
         <div className="text-xl ml-2">Call Mode</div>
         <div className="flex-grow"></div>
-        <button 
+        <button
           onClick={toggleMute}
           className="p-2 hover:bg-gray-600 rounded-full transition-colors"
           title={isMuted ? "Unmute" : "Mute"}
         >
-          {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+          {isMuted ? (
+            <VolumeX className="w-6 h-6" />
+          ) : (
+            <Volume2 className="w-6 h-6" />
+          )}
         </button>
         <button className="p-2">⋮</button>
       </div>
@@ -346,21 +356,19 @@ export default function ChatComponent() {
           <div className="bg-gray-800 rounded-lg p-4 h-full overflow-y-auto">
             <div className="space-y-4">
               {messages.map((message) => (
-                <div 
-                  key={message.id} 
+                <div
+                  key={message.id}
                   className={`flex flex-col ${
-                    message.speaker === 'You' ? 'items-end' : 'items-start'
+                    message.speaker === "You" ? "items-end" : "items-start"
                   }`}
                 >
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <span>{message.speaker}</span>
                     <span>{message.timestamp}</span>
                   </div>
-                  <div 
+                  <div
                     className={`mt-1 px-4 py-2 rounded-lg max-w-[80%] ${
-                      message.speaker === 'You'
-                        ? 'bg-blue-600'
-                        : 'bg-gray-600'
+                      message.speaker === "You" ? "bg-blue-600" : "bg-gray-600"
                     }`}
                   >
                     {message.text}
@@ -369,7 +377,7 @@ export default function ChatComponent() {
               ))}
               <div ref={messagesEndRef} />
             </div>
-            
+
             {/* Status Indicators */}
             {isRecording && (
               <div className="flex items-center justify-center mt-4 text-gray-400">
@@ -379,7 +387,7 @@ export default function ChatComponent() {
                 </div>
               </div>
             )}
-            
+
             {isProcessing && (
               <div className="flex items-center justify-center mt-4 text-gray-400">
                 <div className="animate-pulse flex items-center gap-2">
@@ -403,15 +411,16 @@ export default function ChatComponent() {
         <button className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
           <RotateCw className="text-white w-6 h-6" />
         </button>
-        <button 
+        <button
           onClick={handleToggleRecording}
           className={`w-12 h-12 rounded-full flex items-center justify-center ${
             isRecording ? "bg-red-600" : "bg-blue-600"
-          } ${isSpeaking ? 'opacity-50 cursor-not-allowed' : ''}`}
+          } ${isSpeaking ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={isSpeaking}
         >
           <Mic className="text-white w-6 h-6" />
         </button>
       </div>
     </div>
-  );}
+  );
+}
