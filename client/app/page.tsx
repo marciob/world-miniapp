@@ -1,64 +1,80 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { PayBlock } from '@/components/Pay'
-import { SignIn } from '@/components/SignIn'
-import { VerifyBlock } from '@/components/Verify'
-import { AIChat } from '@/components/AIChat'
-import { motion } from 'framer-motion'
-import Interest from '@/components/Interests'
-import Languages from '@/components/Languages'
-import Conversation from '@/components/Conversation'
+import { useState } from "react";
+import { FaHome, FaComments, FaBook, FaTrophy, FaCoins } from "react-icons/fa";
+import MenuButton from "../components/Menu/MenuButton";
 
 export default function Home() {
-	const [activeTab, setActiveTab] = useState('current')
+  const [activeTab, setActiveTab] = useState("home");
 
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-start p-4 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-			<div className="w-full max-w-md">
-				<div className="flex mb-4">
-					<TabButton active={activeTab === 'current'} onClick={() => setActiveTab('current')}>
-						Current
-					</TabButton>
-					<TabButton active={activeTab === 'ai'} onClick={() => setActiveTab('ai')}>
-						AI Chat
-					</TabButton>
-				</div>
-				<motion.div
-					key={activeTab}
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: -20 }}
-					transition={{ duration: 0.3 }}
-					className="bg-gray-800 rounded-lg shadow-lg p-6"
-				>
-					{activeTab === 'current' ? (
-						<div className="space-y-6">
-							<SignIn />
-							<VerifyBlock />
-							<PayBlock />
-						</div>
-					) : (
-						<AIChat />
-					)}
-				</motion.div>
-				<Interest />
-				<Languages />
-				<Conversation />
-			</div>
-		</main>
-	)
-}
+  // Sample data for demo purposes
+  const coinBalance = 150;
+  const wordOfTheDay = "Perseverance";
+  const wordMeaning =
+    "Persistence in doing something despite difficulty or delay in achieving success.";
 
-function TabButton({ active, onClick, children }) {
-	return (
-		<button
-			onClick={onClick}
-			className={`flex-1 py-2 px-4 text-sm font-medium rounded-t-lg transition-colors duration-300 ${
-				active ? 'bg-gray-800 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-			}`}
-		>
-			{children}
-		</button>
-	)
+  return (
+    <main className="flex flex-col justify-between h-screen bg-gray-100">
+      {/* Header Section */}
+      <header className="flex items-center justify-between bg-blue-500 text-white p-4">
+        <div className="flex items-center space-x-2">
+          <FaCoins size={20} />
+          <span className="text-lg font-semibold">{coinBalance} Coins</span>
+        </div>
+        <h1 className="text-xl font-bold">Daily Learning</h1>
+      </header>
+
+      {/* Content Area */}
+      <div className="flex-grow p-4 space-y-6">
+        {/* Daily Rewards Section */}
+        <section className="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center space-y-2">
+          <h2 className="text-lg font-bold text-blue-600">Daily Rewards</h2>
+          <p className="text-gray-600">
+            Earn coins by completing a minute of study each day!
+          </p>
+          <button className="bg-yellow-400 text-white font-semibold py-2 px-4 rounded-full shadow-md transition transform hover:scale-105">
+            Claim Reward
+          </button>
+        </section>
+
+        {/* Word of the Day Section */}
+        <section className="bg-blue-100 rounded-lg shadow p-4 text-center">
+          <h2 className="text-lg font-bold text-blue-600">Word of the Day</h2>
+          <p className="text-2xl font-semibold text-gray-800 mt-2">
+            {wordOfTheDay}
+          </p>
+          <p className="text-gray-600 mt-1 italic">"{wordMeaning}"</p>
+        </section>
+      </div>
+
+
+      {/* Bottom Navigation Menu */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 flex justify-around py-3 shadow-lg">
+        <MenuButton
+          icon={<FaHome size={24} />}
+          label="Home"
+          isActive={activeTab === "home"}
+          onClick={() => setActiveTab("home")}
+        />
+        <MenuButton
+          icon={<FaComments size={24} />}
+          label="Chat"
+          isActive={activeTab === "chat"}
+          onClick={() => setActiveTab("chat")}
+        />
+        <MenuButton
+          icon={<FaBook size={24} />}
+          label="Lessons"
+          isActive={activeTab === "lessons"}
+          onClick={() => setActiveTab("lessons")}
+        />
+        <MenuButton
+          icon={<FaTrophy size={24} />}
+          label="Ranking"
+          isActive={activeTab === "ranking"}
+          onClick={() => setActiveTab("ranking")}
+        />
+      </nav>
+    </main>
+  );
 }
