@@ -1,20 +1,56 @@
 "use client";
 
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
-import { languages } from "../../mockdata/languages";
-import { FaChevronDown } from "react-icons/fa";
 
-function CustomDropdown({ label, options, selected, setSelected }: any) {
+const languages = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Portuguese",
+  "Russian",
+  "Japanese",
+  "Korean",
+  "Chinese",
+  "Arabic",
+  "Hindi",
+];
+
+const languageEmojis: { [key: string]: string } = {
+  English: "🇬🇧",
+  Spanish: "🇪🇸",
+  French: "🇫🇷",
+  German: "🇩🇪",
+  Italian: "🇮🇹",
+  Portuguese: "🇵🇹",
+  Russian: "🇷🇺",
+  Japanese: "🇯🇵",
+  Korean: "🇰🇷",
+  Chinese: "🇨🇳",
+  Arabic: "🇸🇦",
+  Hindi: "🇮🇳",
+};
+
+interface DropdownProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+  label: string;
+  disabled?: boolean;
+}
+
+const Dropdown: React.FC<DropdownProps> = ({
+  value,
+  onChange,
+  options,
+  label,
+  disabled,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (option: string) => {
-    setSelected(option);
-    setIsOpen(false);
-  };
-
-  // Close dropdown if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -24,46 +60,74 @@ function CustomDropdown({ label, options, selected, setSelected }: any) {
         setIsOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   return (
-    <div ref={dropdownRef} className="relative w-full mb-6">
-      <span className="text-lg font-medium text-gray-800">{label}</span>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="mt-2 w-full p-4 rounded-lg border border-gray-300 bg-white shadow-sm text-gray-800 flex items-center justify-between cursor-pointer focus:outline-none transition-all"
-      >
-        {selected || `Select ${label.toLowerCase()}`}
-        <FaChevronDown
-          className={`ml-2 text-gray-500 transition-transform ${
-            isOpen ? "rotate-180" : "rotate-0"
-          }`}
-        />
-      </button>
+    <div className="w-full mb-6">
+      <h2 className="text-xl font-semibold mb-2 text-gray-800">{label}</h2>
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className={`
+            w-full p-4 rounded-xl border text-left flex items-center justify-between
+            ${
+              disabled
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white cursor-pointer hover:bg-gray-50"
+            }
+            ${isOpen ? "ring-2 ring-black" : "border-gray-200"}
+            transition-all duration-200
+          `}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xl">
+              {value ? languageEmojis[value] : ""}
+            </span>
+            <span className="text-gray-800">{value || "Select language"}</span>
+          </div>
+          <span
+            className={`transform transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          >
+            ▼
+          </span>
+        </button>
 
-      {isOpen && (
-        <ul className="absolute w-full mt-1 max-h-60 overflow-y-auto bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-          {options.map((option: string) => (
-            <li
-              key={option}
-              onClick={() => handleSelect(option)}
-              className="p-3 hover:bg-blue-100 text-gray-800 cursor-pointer"
-            >
-              {option}
-            </li>
-          ))}
-        </ul>
-      )}
+        {isOpen && (
+          <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10">
+            {options.map((option) => (
+              <button
+                key={option}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+                className={`
+                  w-full p-4 text-left flex items-center gap-2 hover:bg-gray-50
+                  ${value === option ? "bg-gray-50" : ""}
+                `}
+              >
+                <span className="text-xl">{languageEmojis[option]}</span>
+                <span className="text-gray-800">{option}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default function LanguageSelection() {
   const router = useRouter();
-  const [nativeLanguage, setNativeLanguage] = useState("English"); // Set default to "English"
-  const [targetLanguage, setTargetLanguage] = useState("Spanish"); // Set default to "Spanish"
+  const [nativeLanguage, setNativeLanguage] = useState("");
+  const [targetLanguage, setTargetLanguage] = useState("");
 
   const handleNext = () => {
     if (nativeLanguage && targetLanguage) {
@@ -73,41 +137,63 @@ export default function LanguageSelection() {
     }
   };
 
+  const filteredLanguages = languages.filter((lang) => lang !== nativeLanguage);
+
   return (
-    <main className="flex flex-col items-center min-h-screen bg-gradient-to-br from-blue-500 to-blue-900 p-6">
-      {/* Title at the top */}
-      <h1 className="text-3xl font-semibold mt-10 mb-10 text-center text-white">
-        Choose Your Languages
-      </h1>
+    <div className="min-h-screen bg-white px-4 py-4">
+      {/* Back button */}
+      <button
+        className="mb-2 text-gray-600 text-2xl"
+        onClick={() => router.back()}
+      >
+        ←
+      </button>
 
-      {/* Centered form container */}
-      <div className="flex-grow flex items-center w-full max-w-md">
-        <div className="w-full bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg">
-          <CustomDropdown
-            label="I speak"
-            options={languages}
-            selected={nativeLanguage}
-            setSelected={setNativeLanguage}
-          />
-
-          <CustomDropdown
-            label="I want to learn"
-            options={languages}
-            selected={targetLanguage}
-            setSelected={setTargetLanguage}
-          />
-        </div>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-semibold leading-tight">
+          Choose your
+          <br />
+          <span className="font-bold">languages</span>
+        </h1>
       </div>
 
-      {/* Fixed "Next" button at the bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-blue-900 to-transparent flex justify-center">
+      {/* Dropdowns Container */}
+      <div className="mb-8">
+        <Dropdown
+          label="I speak"
+          value={nativeLanguage}
+          onChange={setNativeLanguage}
+          options={languages}
+        />
+
+        <Dropdown
+          label="I want to learn"
+          value={targetLanguage}
+          onChange={setTargetLanguage}
+          options={filteredLanguages}
+          disabled={!nativeLanguage}
+        />
+      </div>
+
+      {/* Next Button */}
+      <div className="fixed bottom-6 left-0 right-0 px-4">
         <button
           onClick={handleNext}
-          className="w-full max-w-md bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all"
+          disabled={!nativeLanguage || !targetLanguage}
+          className={`
+            w-full py-3 px-6 rounded-full text-white font-medium
+            transition-all duration-200
+            ${
+              nativeLanguage && targetLanguage
+                ? "bg-black hover:bg-gray-800"
+                : "bg-gray-300 cursor-not-allowed"
+            }
+          `}
         >
           Next
         </button>
       </div>
-    </main>
+    </div>
   );
 }
